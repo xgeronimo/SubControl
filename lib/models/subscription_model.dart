@@ -13,9 +13,13 @@ class Subscription {
   @HiveField(2)
   final String paymentPeriod;
 
+  @HiveField(3)
+  final String category;
+
   Subscription({
     required this.name,
     required this.price,
     required this.paymentPeriod,
+    required this.category,
   });
 }

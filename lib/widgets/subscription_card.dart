@@ -3,8 +3,12 @@ import '../models/subscription_model.dart';
 
 class SubscriptionCard extends StatelessWidget {
   final Subscription subscription;
+  final VoidCallback? onTap;
 
-  SubscriptionCard({required this.subscription});
+  const SubscriptionCard({
+    required this.subscription,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +16,14 @@ class SubscriptionCard extends StatelessWidget {
       margin: EdgeInsets.all(8.0),
       child: ListTile(
         title: Text(subscription.name),
-        subtitle: Text('Цена: ${subscription.price} руб. / ${subscription.paymentPeriod}'),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Цена: ${subscription.price} руб./${subscription.paymentPeriod}'),
+            Text('Категория: ${subscription.category}'),
+          ],
+        ),
+        onTap: onTap,
       ),
     );
   }
