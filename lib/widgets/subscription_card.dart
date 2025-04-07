@@ -19,7 +19,8 @@ class SubscriptionCard extends StatelessWidget {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Цена: ${subscription.price} руб./${subscription.paymentPeriod}'),
+            Text(
+                'Цена: ${subscription.price} руб./${subscription.paymentPeriod}'),
             Text('Категория: ${subscription.category}'),
           ],
         ),

@@ -18,16 +18,19 @@ class HiveService {
   }
 
   // Методы для подписок
-  static Box<Subscription> getSubscriptionBox() => Hive.box<Subscription>('subscriptions');
+  static Box<Subscription> getSubscriptionBox() =>
+      Hive.box<Subscription>('subscriptions');
 
   static void addSubscription(Subscription subscription) {
     getSubscriptionBox().add(subscription);
   }
 
-  static List<Subscription> getSubscriptions() => getSubscriptionBox().values.toList();
+  static List<Subscription> getSubscriptions() =>
+      getSubscriptionBox().values.toList();
 
   static List<Subscription> getSubscriptionsByCategory(String category) {
-    return getSubscriptionBox().values
+    return getSubscriptionBox()
+        .values
         .where((sub) => sub.category == category)
         .toList();
   }

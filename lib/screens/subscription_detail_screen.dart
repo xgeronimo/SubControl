@@ -19,21 +19,27 @@ class SubscriptionDetailScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Название: ${subscription.name}', style: TextStyle(fontSize: 20)),
+            Text('Название: ${subscription.name}',
+                style: TextStyle(fontSize: 20)),
             SizedBox(height: 10),
-            Text('Цена: ${subscription.price} руб. / ${subscription.paymentPeriod}', style: TextStyle(fontSize: 18)),
+            Text(
+                'Цена: ${subscription.price} руб. / ${subscription.paymentPeriod}',
+                style: TextStyle(fontSize: 18)),
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 // Удаление подписки
                 HiveService.deleteSubscription(index);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Подписка "${subscription.name}" удалена')),
+                  SnackBar(
+                      content: Text('Подписка "${subscription.name}" удалена')),
                 );
                 Navigator.pop(context); // Возврат на предыдущий экран
               },
               child: Text('Удалить подписку'),
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.red), // Измените primary на backgroundColor
+              style: ElevatedButton.styleFrom(
+                  backgroundColor:
+                      Colors.red), // Измените primary на backgroundColor
             ),
           ],
         ),

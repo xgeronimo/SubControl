@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/subscription_model.dart';
 import '../services/hive_service.dart';
 import '../widgets/subscription_card.dart';
-import 'add_item_screen.dart';
+import 'add_subscription_screen.dart';
 import 'subscription_detail_screen.dart';
 
 class SubscriptionsScreen extends StatefulWidget {
@@ -30,7 +30,8 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
 
   void _loadSubscriptions() {
     if (widget.showOnlyCategory && widget.categoryName != null) {
-      subscriptions = HiveService.getSubscriptionsByCategory(widget.categoryName!);
+      subscriptions =
+          HiveService.getSubscriptionsByCategory(widget.categoryName!);
     } else {
       subscriptions = HiveService.getSubscriptions();
     }
@@ -50,7 +51,8 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
               // Добавляем подписку и ждем результата
               await Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const AddItemScreen()),
+                MaterialPageRoute(
+                    builder: (context) => const AddSubscriptionScreen()),
               );
               // Обновляем список после возврата
               setState(() {
@@ -68,26 +70,28 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
         },
         child: subscriptions.isEmpty
             ? const Center(
-          child: Text(
-            'Нет подписок',
-            style: TextStyle(fontSize: 18),
-          ),
-        )
+                child: Text(
+                  'Нет подписок',
+                  style: TextStyle(fontSize: 18),
+                ),
+              )
             : ListView.builder(
-          itemCount: subscriptions.length,
-          itemBuilder: (context, index) {
-            final subscription = subscriptions[index];
-            return SubscriptionCard(
-              subscription: subscription,
-              onTap: () => _navigateToDetail(context, subscription, index),
-            );
-          },
-        ),
+                itemCount: subscriptions.length,
+                itemBuilder: (context, index) {
+                  final subscription = subscriptions[index];
+                  return SubscriptionCard(
+                    subscription: subscription,
+                    onTap: () =>
+                        _navigateToDetail(context, subscription, index),
+                  );
+                },
+              ),
       ),
     );
   }
 
-  void _navigateToDetail(BuildContext context, Subscription subscription, int index) {
+  void _navigateToDetail(
+      BuildContext context, Subscription subscription, int index) {
     Navigator.push(
       context,
       MaterialPageRoute(

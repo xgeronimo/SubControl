@@ -29,7 +29,8 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
   }
 
   void _loadSubscriptions() {
-    _subscriptions = HiveService.getSubscriptionsByCategory(widget.category.name);
+    _subscriptions =
+        HiveService.getSubscriptionsByCategory(widget.category.name);
   }
 
   void _refreshSubscriptions() {
@@ -70,22 +71,23 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
       ),
       body: _subscriptions.isEmpty
           ? Center(
-        child: Text(
-          'Нет подписок в этой категории',
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-      )
+              child: Text(
+                'Нет подписок в этой категории',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            )
           : ListView.builder(
-        padding: EdgeInsets.all(8.0),
-        itemCount: _subscriptions.length,
-        itemBuilder: (context, index) {
-          final subscription = _subscriptions[index];
-          return SubscriptionCard(
-            subscription: subscription,
-            onTap: () => _navigateToSubscriptionDetail(subscription, index),
-          );
-        },
-      ),
+              padding: EdgeInsets.all(8.0),
+              itemCount: _subscriptions.length,
+              itemBuilder: (context, index) {
+                final subscription = _subscriptions[index];
+                return SubscriptionCard(
+                  subscription: subscription,
+                  onTap: () =>
+                      _navigateToSubscriptionDetail(subscription, index),
+                );
+              },
+            ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         onPressed: () {
