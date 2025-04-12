@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../models/subscription_model.dart';
 import '../services/hive_service.dart';
 
 class AddSubscriptionScreen extends StatefulWidget {
-  const AddSubscriptionScreen({Key? key}) : super(key: key);
+  final String? preselectedCategory;
+
+  const AddSubscriptionScreen({Key? key, this.preselectedCategory}) : super(key: key);
 
   @override
   _AddSubscriptionScreenState createState() => _AddSubscriptionScreenState();
@@ -47,11 +50,16 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
               TextFormField(
                 controller: _priceController,
                 decoration: const InputDecoration(
-                  labelText: 'Цена',
+                  labelText: 'Цена (₽)',
                   border: OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.number,
-                validator: (value) => value!.isEmpty ? 'Введите цену' : null,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly], // Только цифры
+                validator: (value) {
+                  if (value == null || value.isEmpty) return 'Введите цену';
+                  if (int.tryParse(value) == null) return 'Введите целое число';
+                  return null;
+                },
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
@@ -110,11 +118,10 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
     if (_formKey.currentState!.validate()) {
       final subscription = Subscription(
         name: _nameController.text,
-        price: double.parse(_priceController.text),
+        price: int.parse(_priceController.text),
         paymentPeriod: _paymentPeriod,
         category: _selectedCategory ?? 'Без категории',
       );
-
       HiveService.addSubscription(subscription);
       Navigator.pop(context);
     }

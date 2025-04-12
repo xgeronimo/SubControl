@@ -8,7 +8,7 @@ class Subscription {
   final String name;
 
   @HiveField(1)
-  final double price;
+  final int price;
 
   @HiveField(2)
   final String paymentPeriod;
@@ -22,4 +22,18 @@ class Subscription {
     required this.paymentPeriod,
     required this.category,
   });
+
+  Subscription copyWith({
+    String? name,
+    int? price,
+    String? paymentPeriod,
+    String? category,
+  }) {
+    return Subscription(
+      name: name ?? this.name,
+      price: price ?? this.price,
+      paymentPeriod: paymentPeriod ?? this.paymentPeriod,
+      category: category ?? this.category,
+    );
+  }
 }

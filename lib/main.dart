@@ -43,7 +43,7 @@ class _MainScreenState extends State<MainScreen> {
 
   final List<Widget> _screens = [
     const SubscriptionsScreen(),
-    const CategoriesScreen(),
+    CategoriesScreen(),
     SettingsScreen(),
   ];
 
@@ -58,7 +58,6 @@ class _MainScreenState extends State<MainScreen> {
         currentIndex: _selectedIndex,
         onTap: (index) {
           if (index == 2) {
-            // Если нажали на кнопку добавления
             Navigator.pushNamed(context, '/add-subscription');
           } else {
             setState(() {

@@ -7,6 +7,7 @@ class HiveService {
   static Future<void> init() async {
     await Hive.initFlutter();
 
+    //await Hive.close();
     //await Hive.deleteBoxFromDisk('subscriptions');
     //await Hive.deleteBoxFromDisk('categories');
 
@@ -17,12 +18,15 @@ class HiveService {
     await Hive.openBox<Category>('categories');
   }
 
-  // Методы для подписок
-  static Box<Subscription> getSubscriptionBox() =>
-      Hive.box<Subscription>('subscriptions');
+  static Box<Subscription> getSubscriptionBox() => Hive.box<Subscription>('subscriptions');
+  static Box<Category> getCategoryBox() => Hive.box<Category>('categories');
 
   static void addSubscription(Subscription subscription) {
     getSubscriptionBox().add(subscription);
+  }
+
+  static void addCategory(String name) {
+    getCategoryBox().add(Category(name: name));
   }
 
   static List<Subscription> getSubscriptions() =>
@@ -39,11 +43,9 @@ class HiveService {
     getSubscriptionBox().deleteAt(index);
   }
 
-  // Методы для категорий
-  static Box<Category> getCategoryBox() => Hive.box<Category>('categories');
-
-  static void addCategory(String name) {
-    getCategoryBox().add(Category(name: name));
+  static void updateSubscription(int index, Subscription newSubscription) {
+    getSubscriptionBox().putAt(index, newSubscription);
+    //getSubscriptionBox().listenable().notifyListeners();
   }
 
   static List<Category> getCategories() => getCategoryBox().values.toList();

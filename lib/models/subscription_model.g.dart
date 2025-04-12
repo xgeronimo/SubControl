@@ -18,7 +18,7 @@ class SubscriptionAdapter extends TypeAdapter<Subscription> {
     };
     return Subscription(
       name: fields[0] as String,
-      price: fields[1] as double,
+      price: fields[1] as int,
       paymentPeriod: fields[2] as String,
       category: fields[3] as String,
     );
