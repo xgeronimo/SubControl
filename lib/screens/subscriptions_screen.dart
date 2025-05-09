@@ -4,6 +4,8 @@ import '../services/hive_service.dart';
 import '../widgets/subscription_card.dart';
 import 'add_subscription_screen.dart';
 import 'subscription_detail_screen.dart';
+import 'stats_screen.dart';
+import 'settings_screen.dart';
 
 class SubscriptionsScreen extends StatefulWidget {
   final String? categoryName;
@@ -37,47 +39,68 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
     }
   }
 
+  void _showStatistics(BuildContext context) {
+    final allSubscriptions = HiveService.getSubscriptions();
+    final totalMonthly = allSubscriptions.fold<double>(0, (sum, sub) {
+      final price = sub.price.toDouble();
+      return sum + (sub.paymentPeriod == 'Год' ? price / 12 : price);
+    });
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => StatsScreen(
+        subscriptions: allSubscriptions,
+        totalMonthly: totalMonthly,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: widget.showOnlyCategory
-            ? Text('Подписки: ${widget.categoryName}')
-            : const Text('Все подписки'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () async {
-              // Добавляем подписку и ждем результата
-              await Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const AddSubscriptionScreen()),
-              );
-              // Обновляем список после возврата
-              setState(() {
-                _loadSubscriptions();
-              });
-            },
-          ),
-        ],
-      ),
       body: RefreshIndicator(
         onRefresh: () async {
           setState(() {
             _loadSubscriptions();
           });
         },
-        child: subscriptions.isEmpty
-            ? const Center(
-                child: Text(
-                  'Нет подписок',
-                  style: TextStyle(fontSize: 18),
-                ),
-              )
-            : ListView.builder(
-                itemCount: subscriptions.length,
-                itemBuilder: (context, index) {
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: <Widget>[
+            SliverAppBar(
+              pinned: true,
+              expandedHeight: 100,
+              leading: IconButton(
+                icon: const Icon(Icons.person_outline_rounded),
+                tooltip: 'Настройки',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SettingsScreen(),
+                    ),
+                  );
+                },
+              ),
+              actions: [
+                if (!widget.showOnlyCategory)
+                  IconButton(
+                    icon: const Icon(Icons.bar_chart),
+                    tooltip: 'Показать статистику',
+                    onPressed: () => _showStatistics(context),
+                  ),
+              ],
+              flexibleSpace: FlexibleSpaceBar(
+                centerTitle: true,
+                title: const Text("Мои подписки"),
+                titlePadding:
+                    const EdgeInsetsDirectional.only(end: 0, bottom: 16),
+              ),
+            ),
+            SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (BuildContext context, int index) {
                   final subscription = subscriptions[index];
                   return SubscriptionCard(
                     subscription: subscription,
@@ -85,7 +108,11 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
                         _navigateToDetail(context, subscription, index),
                   );
                 },
+                childCount: subscriptions.length,
               ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -100,6 +127,10 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
           index: index,
         ),
       ),
-    ).then((_) => setState(() => _loadSubscriptions()));
+    ).then((_) {
+      setState(() {
+        _loadSubscriptions();
+      });
+    });
   }
 }

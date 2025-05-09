@@ -18,7 +18,8 @@ class HiveService {
     await Hive.openBox<Category>('categories');
   }
 
-  static Box<Subscription> getSubscriptionBox() => Hive.box<Subscription>('subscriptions');
+  static Box<Subscription> getSubscriptionBox() =>
+      Hive.box<Subscription>('subscriptions');
   static Box<Category> getCategoryBox() => Hive.box<Category>('categories');
 
   static void addSubscription(Subscription subscription) {

@@ -1,3 +1,4 @@
+import 'dart:ui'; // Для lerpDouble
 import 'package:flutter/material.dart';
 import '../models/category_model.dart';
 import '../models/subscription_model.dart';
@@ -25,64 +26,6 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       categories = HiveService.getCategories();
       subscriptions = HiveService.getSubscriptions();
     });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Категории'),
-        elevation: 0,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Все категории',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: categories.isEmpty
-                  ? _buildEmptyState()
-                  : GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                  childAspectRatio: 1.2,
-                ),
-                itemCount: categories.length,
-                itemBuilder: (context, index) {
-                  final category = categories[index];
-                  final categorySubs = subscriptions
-                      .where((sub) => sub.category == category.name)
-                      .toList();
-                  final total = categorySubs.fold(
-                      0, (sum, sub) => sum + sub.price.toInt());
-
-                  return CategoryCard(
-                    category: category,
-                    count: categorySubs.length,
-                    total: total,
-                    onTap: () => _openCategory(context, category),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _createNewCategory(context),
-        child: const Icon(Icons.add),
-      ),
-    );
   }
 
   Widget _buildEmptyState() {
@@ -124,5 +67,98 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     if (result == true) {
       _loadData();
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: RefreshIndicator(
+        onRefresh: () async {
+          _loadData();
+        },
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: <Widget>[
+            SliverAppBar(
+              pinned: true,
+              expandedHeight: 100,
+              backgroundColor: Colors.black,
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.add),
+                  onPressed: () => _createNewCategory(context),
+                ),
+              ],
+              flexibleSpace: LayoutBuilder(
+                builder: (BuildContext context, BoxConstraints constraints) {
+                  const double expandedHeight = 120;
+                  const double collapsedHeight = kToolbarHeight;
+                  double t = (constraints.biggest.height - collapsedHeight) /
+                      (expandedHeight - collapsedHeight);
+                  double topPosition = lerpDouble(18, 64, t)!;
+                  double fontSize = lerpDouble(20, 32, t)!;
+                  return Container(
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Colors.blue, Colors.white],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ),
+                    ),
+                    child: Stack(
+                      children: [
+                        Positioned(
+                          left: 16,
+                          top: topPosition,
+                          child: Text(
+                            "Категории",
+                            style: TextStyle(
+                              fontSize: fontSize,
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+            categories.isEmpty
+                ? SliverFillRemaining(child: _buildEmptyState())
+                : SliverPadding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    sliver: SliverGrid(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 16,
+                        childAspectRatio: 1.2,
+                      ),
+                      delegate: SliverChildBuilderDelegate(
+                        (BuildContext context, int index) {
+                          final category = categories[index];
+                          final categorySubs = subscriptions
+                              .where((sub) => sub.category == category.name)
+                              .toList();
+                          final total = categorySubs.fold(
+                              0, (sum, sub) => sum + sub.price.toInt());
+                          return CategoryCard(
+                            category: category,
+                            count: categorySubs.length,
+                            total: total,
+                            onTap: () => _openCategory(context, category),
+                          );
+                        },
+                        childCount: categories.length,
+                      ),
+                    ),
+                  ),
+          ],
+        ),
+      ),
+    );
   }
 }

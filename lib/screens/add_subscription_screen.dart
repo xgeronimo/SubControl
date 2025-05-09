@@ -6,7 +6,8 @@ import '../services/hive_service.dart';
 class AddSubscriptionScreen extends StatefulWidget {
   final String? preselectedCategory;
 
-  const AddSubscriptionScreen({Key? key, this.preselectedCategory}) : super(key: key);
+  const AddSubscriptionScreen({Key? key, this.preselectedCategory})
+      : super(key: key);
 
   @override
   _AddSubscriptionScreenState createState() => _AddSubscriptionScreenState();
@@ -54,7 +55,9 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
                   border: OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly], // Только цифры
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly
+                ],
                 validator: (value) {
                   if (value == null || value.isEmpty) return 'Введите цену';
                   if (int.tryParse(value) == null) return 'Введите целое число';

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 final ThemeData appTheme = ThemeData(
   primarySwatch: Colors.blue,
-  scaffoldBackgroundColor: Colors.grey[50],
+  scaffoldBackgroundColor: Colors.white,
   appBarTheme: const AppBarTheme(
     elevation: 0,
     centerTitle: true,
@@ -36,5 +36,17 @@ final ThemeData appTheme = ThemeData(
       horizontal: 16,
       vertical: 12,
     ),
+  ),
+  floatingActionButtonTheme: FloatingActionButtonThemeData(
+    backgroundColor: Colors.blue,
+    elevation: 4,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(30),
+    ),
+  ),
+  bottomAppBarTheme: BottomAppBarTheme(
+    color: Colors.white,
+    elevation: 8,
+    shape: CircularNotchedRectangle(),
   ),
 );

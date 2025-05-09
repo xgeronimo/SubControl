@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:sub_control/screens/subscription_detail_screen.dart';
 import '../models/category_model.dart';
 import '../models/subscription_model.dart';
 import '../services/hive_service.dart';
+import '../widgets/subscription_card.dart';
+import '../widgets/category_info_card.dart';
+import '../widgets/uncategorized_subscriptions_sheet.dart';
 
 class CategoryDetailScreen extends StatefulWidget {
   final Category category;
@@ -17,80 +22,79 @@ class CategoryDetailScreen extends StatefulWidget {
   _CategoryDetailScreenState createState() => _CategoryDetailScreenState();
 }
 
-class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
+class _CategoryDetailScreenState extends State<CategoryDetailScreen>
+    with TickerProviderStateMixin {
   late List<Subscription> _categorySubscriptions;
+  late AnimationController _animationController;
 
   @override
   void initState() {
     super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
     _loadSubscriptions();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
   }
 
   void _loadSubscriptions() {
     setState(() {
       _categorySubscriptions = HiveService.getSubscriptions()
           .where((sub) => sub.category == widget.category.name)
-          .toList();
+          .toList()
+        ..sort((a, b) => b.price.compareTo(a.price));
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final monthlyTotal = _calculateMonthlyTotal();
+    final yearlyTotal = monthlyTotal * 12;
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.category.name),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: _showUncategorizedSubscriptions,
-          ),
-          IconButton(
-            icon: const Icon(Icons.delete),
-            tooltip: 'Удалить категорию',
-            onPressed: () => _showDeleteConfirmation(context),
-          ),
-        ],
-      ),
-      body: _buildBody(),
+      appBar: _buildAppBar(),
+      body: _buildBody(monthlyTotal, yearlyTotal),
     );
   }
 
-  Widget _buildBody() {
+  AppBar _buildAppBar() {
+    return AppBar(
+      title: Text(widget.category.name),
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.add),
+          onPressed: _showUncategorizedSubscriptions,
+        ),
+        IconButton(
+          icon: const Icon(Icons.delete),
+          tooltip: 'Удалить категорию',
+          onPressed: () => _showDeleteConfirmation(context),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBody(double monthlyTotal, double yearlyTotal) {
     return Column(
       children: [
-        _buildStatsCard(),
+        CategoryInfoCard(
+          categoryName: widget.category.name,
+          subscriptionsCount: _categorySubscriptions.length,
+          monthlyTotal: monthlyTotal,
+          yearlyTotal: yearlyTotal,
+        ),
         Expanded(
           child: _categorySubscriptions.isEmpty
               ? _buildEmptyState()
               : _buildSubscriptionList(),
         ),
       ],
-    );
-  }
-
-  Widget _buildStatsCard() {
-    final total = _categorySubscriptions.fold(
-        0, (sum, sub) => sum + sub.price);
-
-    return Card(
-      margin: const EdgeInsets.all(16),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Text('${_categorySubscriptions.length} подписок'),
-            const SizedBox(height: 8),
-            Text(
-              '$total ₽/мес',
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.blue,
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -112,19 +116,138 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
 
   Widget _buildSubscriptionList() {
     return ListView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       itemCount: _categorySubscriptions.length,
       itemBuilder: (context, index) {
         final subscription = _categorySubscriptions[index];
-        return ListTile(
-          title: Text(subscription.name),
-          subtitle: Text('${subscription.price} ₽/${subscription.paymentPeriod}'),
-          trailing: IconButton(
-            icon: const Icon(Icons.delete, color: Colors.red),
-            onPressed: () => _removeSubscriptionFromCategory(subscription),
-          ),
-        );
+        return _buildDismissibleSubscription(subscription, index);
       },
     );
+  }
+
+  Widget _buildDismissibleSubscription(Subscription subscription, int index) {
+    return Dismissible(
+      key: Key('${subscription.name}_${DateTime.now().millisecondsSinceEpoch}'),
+      direction: DismissDirection.endToStart,
+      background: _buildDismissBackground(),
+      secondaryBackground: _buildDismissSecondaryBackground(),
+      confirmDismiss: (direction) => _confirmDismiss(subscription),
+      onDismissed: (direction) => _handleDismissed(subscription, index),
+      movementDuration: const Duration(milliseconds: 200),
+      dismissThresholds: const {DismissDirection.endToStart: 0.4},
+      child: SubscriptionCard(
+        subscription: subscription,
+        onTap: () => _navigateToDetail(subscription, index),
+      ),
+    );
+  }
+
+  Widget _buildDismissBackground() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.red.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(12),
+      ),
+    );
+  }
+
+  Widget _buildDismissSecondaryBackground() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.red.shade400,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      alignment: Alignment.centerRight,
+      padding: const EdgeInsets.only(right: 20),
+      child: const Icon(Icons.delete, color: Colors.white, size: 30),
+    );
+  }
+
+  Future<bool?> _confirmDismiss(Subscription subscription) async {
+    await HapticFeedback.lightImpact();
+    return await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Удалить из категории?'),
+        content: Text(
+            'Подписка "${subscription.name}" будет перемещена в "Без категории"'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Отмена'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Удалить', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _handleDismissed(Subscription subscription, int index) {
+    _removeSubscriptionFromCategory(subscription, index);
+  }
+
+  void _removeSubscriptionFromCategory(Subscription subscription, int index) {
+    final box = HiveService.getSubscriptionBox();
+    final globalIndex = box.keyAt(box.values.toList().indexOf(subscription));
+
+    HiveService.updateSubscription(
+      globalIndex,
+      subscription.copyWith(category: 'Без категории'),
+    );
+
+    setState(() => _categorySubscriptions.removeAt(index));
+
+    _showUndoSnackbar(subscription, globalIndex);
+  }
+
+  void _showUndoSnackbar(Subscription subscription, int globalIndex) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text('Подписка перемещена в "Без категории"'),
+        duration: const Duration(seconds: 4),
+        action: SnackBarAction(
+          label: 'Отменить',
+          onPressed: () => _undoDelete(subscription, globalIndex),
+        ),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        margin: const EdgeInsets.all(16),
+      ),
+    );
+  }
+
+  void _undoDelete(Subscription subscription, int globalIndex) {
+    HiveService.updateSubscription(
+      globalIndex,
+      subscription.copyWith(category: widget.category.name),
+    );
+    setState(() {
+      _categorySubscriptions.add(subscription);
+      _categorySubscriptions.sort((a, b) => b.price.compareTo(a.price));
+    });
+  }
+
+  double _calculateMonthlyTotal() {
+    return _categorySubscriptions.fold<double>(0, (sum, sub) {
+      final price = sub.price.toDouble();
+      return sum + (sub.paymentPeriod == 'Год' ? price / 12 : price);
+    });
+  }
+
+  void _navigateToDetail(Subscription subscription, int index) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SubscriptionDetailScreen(
+          subscription: subscription,
+          index: index,
+        ),
+      ),
+    );
+    _loadSubscriptions();
   }
 
   void _showUncategorizedSubscriptions() {
@@ -136,50 +259,9 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        height: MediaQuery.of(context).size.height * 0.8,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Подписки без категории',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: uncategorizedSubs.isEmpty
-                  ? const Center(child: Text('Нет подписок без категории'))
-                  : ListView.builder(
-                itemCount: uncategorizedSubs.length,
-                itemBuilder: (context, index) {
-                  final sub = uncategorizedSubs[index];
-                  return ListTile(
-                    title: Text(sub.name),
-                    subtitle: Text('${sub.price} ₽/${sub.paymentPeriod}'),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.add),
-                      onPressed: () => _moveSubscriptionToCategory(sub),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
+      builder: (context) => UncategorizedSubscriptionsSheet(
+        subscriptions: uncategorizedSubs,
+        onAddToCategory: _moveSubscriptionToCategory,
       ),
     );
   }
@@ -194,21 +276,10 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
       Navigator.pop(context);
       setState(() => _loadSubscriptions());
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Подписка добавлена в ${widget.category.name}')),
-      );
-    }
-  }
-
-  void _removeSubscriptionFromCategory(Subscription subscription) {
-    final index = HiveService.getSubscriptions().indexOf(subscription);
-    if (index != -1) {
-      HiveService.updateSubscription(
-        index,
-        subscription.copyWith(category: 'Без категории'),
-      );
-      setState(() => _loadSubscriptions());
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Подписка удалена из категории')),
+        SnackBar(
+          content: Text('Подписка добавлена в ${widget.category.name}'),
+          duration: const Duration(seconds: 2),
+        ),
       );
     }
   }
@@ -230,18 +301,13 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text(
-              'Удалить',
-              style: TextStyle(color: Colors.red),
-            ),
+            child: const Text('Удалить', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
     );
 
-    if (confirmed == true) {
-      _deleteCategory();
-    }
+    if (confirmed == true) _deleteCategory();
   }
 
   void _deleteCategory() {

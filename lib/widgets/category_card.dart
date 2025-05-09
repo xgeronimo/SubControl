@@ -66,11 +66,14 @@ class CategoryCard extends StatelessWidget {
   String _getSubscriptionWord(int count) {
     if (count % 100 >= 11 && count % 100 <= 19) return 'подписок';
     switch (count % 10) {
-      case 1: return 'подписка';
+      case 1:
+        return 'подписка';
       case 2:
       case 3:
-      case 4: return 'подписки';
-      default: return 'подписок';
+      case 4:
+        return 'подписки';
+      default:
+        return 'подписок';
     }
   }
 }
