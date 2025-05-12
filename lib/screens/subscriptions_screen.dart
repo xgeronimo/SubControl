@@ -31,12 +31,10 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
   }
 
   void _loadSubscriptions() {
-    if (widget.showOnlyCategory && widget.categoryName != null) {
-      subscriptions =
-          HiveService.getSubscriptionsByCategory(widget.categoryName!);
-    } else {
-      subscriptions = HiveService.getSubscriptions();
-    }
+    setState(() {
+      subscriptions = HiveService.getSubscriptions()
+        ..sort((a, b) => a.nextPaymentDate.compareTo(b.nextPaymentDate));
+    });
   }
 
   void _showStatistics(BuildContext context) {

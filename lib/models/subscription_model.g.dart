@@ -17,25 +17,37 @@ class SubscriptionAdapter extends TypeAdapter<Subscription> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Subscription(
-      name: fields[0] as String,
-      price: fields[1] as int,
-      paymentPeriod: fields[2] as String,
-      category: fields[3] as String,
+      id: fields[0] as String,
+      name: fields[1] as String,
+      price: fields[2] as int,
+      paymentPeriod: fields[3] as String,
+      category: fields[4] as String,
+      nextPaymentDate: fields[5] as DateTime,
+      note: fields[6] as String,
+      notificationDays: fields[7] as int,
     );
   }
 
   @override
   void write(BinaryWriter writer, Subscription obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(8)
       ..writeByte(0)
-      ..write(obj.name)
+      ..write(obj.id)
       ..writeByte(1)
-      ..write(obj.price)
+      ..write(obj.name)
       ..writeByte(2)
-      ..write(obj.paymentPeriod)
+      ..write(obj.price)
       ..writeByte(3)
-      ..write(obj.category);
+      ..write(obj.paymentPeriod)
+      ..writeByte(4)
+      ..write(obj.category)
+      ..writeByte(5)
+      ..write(obj.nextPaymentDate)
+      ..writeByte(6)
+      ..write(obj.note)
+      ..writeByte(7)
+      ..write(obj.notificationDays);
   }
 
   @override

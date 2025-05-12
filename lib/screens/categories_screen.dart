@@ -95,6 +95,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                   const double collapsedHeight = kToolbarHeight;
                   double t = (constraints.biggest.height - collapsedHeight) /
                       (expandedHeight - collapsedHeight);
+
                   double topPosition = lerpDouble(18, 64, t)!;
                   double fontSize = lerpDouble(20, 32, t)!;
                   return Container(
@@ -125,6 +126,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                 },
               ),
             ),
+            // Отображаем либо сетку категорий, либо пустое состояние
             categories.isEmpty
                 ? SliverFillRemaining(child: _buildEmptyState())
                 : SliverPadding(

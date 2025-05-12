@@ -47,5 +47,19 @@
 	<true/>
 	<key>NSLocalNetworkUsageDescription</key>
     <string>Это приложение требует доступ к локальной сети для работы.</string>
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>fetch</string>
+        <string>remote-notification</string>
+    </array>
+
+    <key>NSUserNotificationAlertStyle</key>
+    <string>alert</string>
+
+    <key>NSAppTransportSecurity</key>
+    <dict>
+        <key>NSAllowsArbitraryLoads</key>
+        <true/>
+    </dict>
 </dict>
 </plist>

@@ -1,7 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../services/notification_service.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
+  @override
+  _SettingsScreenState createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  late Future<bool> _notificationsEnabled;
+
+  @override
+  void initState() {
+    super.initState();
+    _notificationsEnabled = NotificationService().notificationsEnabled;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -11,30 +25,24 @@ class SettingsScreen extends StatelessWidget {
       body: ListView(
         padding: EdgeInsets.all(16),
         children: [
-          Text('Основные настройки',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          SizedBox(height: 20),
-          ListTile(
-            leading: Icon(Icons.palette),
-            title: Text('Тема приложения'),
-            subtitle: Text('Светлая / Темная'),
-            onTap: () {
+          FutureBuilder<bool>(
+            future: _notificationsEnabled,
+            builder: (context, snapshot) {
+              final isEnabled = snapshot.data ?? true;
+              return SwitchListTile(
+                title: Text('Уведомления'),
+                subtitle: Text('Включить/выключить все уведомления'),
+                value: isEnabled,
+                onChanged: (value) async {
+                  await NotificationService().setNotificationsEnabled(value);
+                  setState(() {
+                    _notificationsEnabled = Future.value(value);
+                  });
+                },
+              );
             },
           ),
-          ListTile(
-            leading: Icon(Icons.notifications),
-            title: Text('Уведомления'),
-            subtitle: Text('Настройка уведомлений'),
-            onTap: () {
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.backup),
-            title: Text('Резервное копирование'),
-            subtitle: Text('Экспорт/импорт данных'),
-            onTap: () {
-            },
-          ),
+          // ... другие настройки
         ],
       ),
     );

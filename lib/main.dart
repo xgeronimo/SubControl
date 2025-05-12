@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:sub_control/screens/add_category_screen.dart';
+import 'package:sub_control/screens/add_subscription_screen.dart';
 import 'screens/subscriptions_screen.dart';
 import 'screens/categories_screen.dart';
-import 'screens/add_subscription_screen.dart';
 import 'screens/settings_screen.dart';
-import 'screens/add_category_screen.dart';
 import 'services/hive_service.dart';
+import 'services/notification_service.dart';
 import 'theme/theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await HiveService.init();
+  await NotificationService().initialize();
   runApp(const MyApp());
 }
 
@@ -115,8 +118,7 @@ class CustomBottomNavBar extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: <Widget>[
                 _buildNavItem(Icons.list, 0, 'Подписки', context),
-                const SizedBox(
-                    width: 70),
+                const SizedBox(width: 70),
                 _buildNavItem(Icons.category, 1, 'Категории', context),
               ],
             ),

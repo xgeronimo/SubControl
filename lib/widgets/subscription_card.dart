@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../models/subscription_model.dart';
 
 class SubscriptionCard extends StatelessWidget {
@@ -13,7 +14,6 @@ class SubscriptionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: ListTile(
         title: Text(subscription.name),
         subtitle: Column(
@@ -21,7 +21,7 @@ class SubscriptionCard extends StatelessWidget {
           children: [
             Text('${subscription.price} ₽/${subscription.paymentPeriod}'),
             Text(
-              subscription.category,
+              'Следующая оплата: ${DateFormat('dd.MM.yyyy').format(subscription.nextPaymentDate)}',
               style: TextStyle(color: Colors.grey[600]),
             ),
           ],
