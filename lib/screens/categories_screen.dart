@@ -1,4 +1,4 @@
-import 'dart:ui'; // Для lerpDouble
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../models/category_model.dart';
 import '../models/subscription_model.dart';
@@ -82,51 +82,26 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
             SliverAppBar(
               pinned: true,
               expandedHeight: 100,
-              backgroundColor: Colors.black,
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
               actions: [
                 IconButton(
                   icon: const Icon(Icons.add),
                   onPressed: () => _createNewCategory(context),
                 ),
               ],
-              flexibleSpace: LayoutBuilder(
-                builder: (BuildContext context, BoxConstraints constraints) {
-                  const double expandedHeight = 120;
-                  const double collapsedHeight = kToolbarHeight;
-                  double t = (constraints.biggest.height - collapsedHeight) /
-                      (expandedHeight - collapsedHeight);
-
-                  double topPosition = lerpDouble(18, 64, t)!;
-                  double fontSize = lerpDouble(20, 32, t)!;
-                  return Container(
-                    decoration: const BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [Colors.blue, Colors.white],
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                      ),
-                    ),
-                    child: Stack(
-                      children: [
-                        Positioned(
-                          left: 16,
-                          top: topPosition,
-                          child: Text(
-                            "Категории",
-                            style: TextStyle(
-                              fontSize: fontSize,
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
+              flexibleSpace: FlexibleSpaceBar(
+                centerTitle: true,
+                titlePadding: const EdgeInsetsDirectional.only(bottom: 16),
+                title: Text(
+                  "Категории",
+                  style: TextStyle(
+                    color: Theme.of(context).appBarTheme.titleTextStyle?.color,
+                    fontSize: 22,
+                    //fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             ),
-            // Отображаем либо сетку категорий, либо пустое состояние
             categories.isEmpty
                 ? SliverFillRemaining(child: _buildEmptyState())
                 : SliverPadding(
@@ -145,8 +120,14 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                           final categorySubs = subscriptions
                               .where((sub) => sub.category == category.name)
                               .toList();
-                          final total = categorySubs.fold(
-                              0, (sum, sub) => sum + sub.price.toInt());
+
+                          final total = categorySubs.fold<int>(0, (sum, sub) {
+                            final monthlyPrice = sub.paymentPeriod == 'Год'
+                                ? sub.price ~/ 12
+                                : sub.price;
+                            return sum + monthlyPrice;
+                          });
+
                           return CategoryCard(
                             category: category,
                             count: categorySubs.length,

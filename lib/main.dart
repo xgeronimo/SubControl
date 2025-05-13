@@ -1,19 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sub_control/screens/add_category_screen.dart';
 import 'package:sub_control/screens/add_subscription_screen.dart';
-import 'screens/subscriptions_screen.dart';
-import 'screens/categories_screen.dart';
-import 'screens/settings_screen.dart';
-import 'services/hive_service.dart';
-import 'services/notification_service.dart';
-import 'theme/theme.dart';
+import 'package:sub_control/screens/subscriptions_screen.dart';
+import 'package:sub_control/screens/categories_screen.dart';
+import 'package:sub_control/screens/settings_screen.dart';
+import 'package:sub_control/services/hive_service.dart';
+import 'package:sub_control/services/notification_service.dart';
+import 'package:sub_control/theme/theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await HiveService.init();
   await NotificationService().initialize();
-  runApp(const MyApp());
+
+  final prefs = await SharedPreferences.getInstance();
+  final isDark = prefs.getBool('isDark') ?? false;
+
+  runApp(
+    ChangeNotifierProvider<AppTheme>(
+      create: (_) => AppTheme()..toggleTheme(isDark),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -21,9 +31,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appTheme = Provider.of<AppTheme>(context);
+
     return MaterialApp(
       title: 'Менеджер подписок',
-      theme: appTheme,
+      theme: appTheme.currentTheme,
       initialRoute: '/',
       routes: {
         '/': (context) => const MainScreen(),

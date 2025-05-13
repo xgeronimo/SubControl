@@ -61,7 +61,7 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
   void _saveCategory() {
     if (_formKey.currentState!.validate()) {
       HiveService.addCategory(_nameController.text);
-      Navigator.pop(context, true); // Возвращаем true как результат
+      Navigator.pop(context, true);
     }
   }
 

@@ -14,6 +14,7 @@ class SubscriptionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       child: ListTile(
         title: Text(subscription.name),
         subtitle: Column(
