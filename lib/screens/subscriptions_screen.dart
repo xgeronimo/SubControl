@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../models/subscription_model.dart';
 import '../services/hive_service.dart';
 import '../widgets/subscription_card.dart';
-import 'add_subscription_screen.dart';
 import 'subscription_detail_screen.dart';
 import 'stats_screen.dart';
 import 'settings_screen.dart';
@@ -12,16 +11,16 @@ class SubscriptionsScreen extends StatefulWidget {
   final bool showOnlyCategory;
 
   const SubscriptionsScreen({
-    Key? key,
+    super.key,
     this.categoryName,
     this.showOnlyCategory = false,
-  }) : super(key: key);
+  });
 
   @override
-  _SubscriptionsScreenState createState() => _SubscriptionsScreenState();
+  SubscriptionsScreenState createState() => SubscriptionsScreenState();
 }
 
-class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
+class SubscriptionsScreenState extends State<SubscriptionsScreen> {
   late List<Subscription> subscriptions;
 
   @override

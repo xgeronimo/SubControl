@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sub_control/services/notification_service.dart';
@@ -7,21 +6,23 @@ import 'package:sub_control/theme/theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SettingsScreen extends StatefulWidget {
+  const SettingsScreen({super.key});
+
   @override
-  _SettingsScreenState createState() => _SettingsScreenState();
+  SettingsScreenState createState() => SettingsScreenState();
 }
 
-class _SettingsScreenState extends State<SettingsScreen> {
+class SettingsScreenState extends State<SettingsScreen> {
   late Future<bool> _notificationsEnabled;
   late bool _isDarkMode;
-  late Future<PackageInfo> _packageInfo;
+  //late Future<PackageInfo> _packageInfo;
 
   @override
   void initState() {
     super.initState();
     _notificationsEnabled = NotificationService().notificationsEnabled;
     _isDarkMode = Provider.of<AppTheme>(context, listen: false).isDarkMode;
-    _packageInfo = PackageInfo.fromPlatform();
+    //_packageInfo = PackageInfo.fromPlatform();
   }
 
   Future<void> _launchURL(String url) async {

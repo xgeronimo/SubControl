@@ -10,17 +10,17 @@ class SubscriptionDetailScreen extends StatefulWidget {
   final int index;
 
   const SubscriptionDetailScreen({
-    Key? key,
+    super.key,
     required this.subscription,
     required this.index,
-  }) : super(key: key);
+  });
 
   @override
-  _SubscriptionDetailScreenState createState() =>
-      _SubscriptionDetailScreenState();
+  SubscriptionDetailScreenState createState() =>
+      SubscriptionDetailScreenState();
 }
 
-class _SubscriptionDetailScreenState extends State<SubscriptionDetailScreen> {
+class SubscriptionDetailScreenState extends State<SubscriptionDetailScreen> {
   late Subscription _currentSubscription;
   String? _selectedCategory;
   final _nameController = TextEditingController();
@@ -199,11 +199,11 @@ class _SubscriptionDetailScreenState extends State<SubscriptionDetailScreen> {
   Widget _buildDeleteButton() {
     return ElevatedButton(
         onPressed: _deleteSubscription,
-        child: const Text('Удалить подписку'),
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.red,
           minimumSize: const Size(double.infinity, 50),
-        ));
+        ),
+        child: const Text('Удалить подписку'));
   }
 
   void _updateSubscription() async {

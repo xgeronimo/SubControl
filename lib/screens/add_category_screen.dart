@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import '../services/hive_service.dart';
 
 class AddCategoryScreen extends StatefulWidget {
-  const AddCategoryScreen({Key? key}) : super(key: key);
+  const AddCategoryScreen({super.key});
 
   @override
-  _AddCategoryScreenState createState() => _AddCategoryScreenState();
+  AddCategoryScreenState createState() => AddCategoryScreenState();
 }
 
-class _AddCategoryScreenState extends State<AddCategoryScreen> {
+class AddCategoryScreenState extends State<AddCategoryScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
 

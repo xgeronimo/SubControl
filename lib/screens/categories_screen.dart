@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../models/category_model.dart';
 import '../models/subscription_model.dart';
@@ -7,11 +6,13 @@ import '../widgets/category_card.dart';
 import 'category_detail_screen.dart';
 
 class CategoriesScreen extends StatefulWidget {
+  const CategoriesScreen({super.key});
+
   @override
-  _CategoriesScreenState createState() => _CategoriesScreenState();
+  CategoriesScreenState createState() => CategoriesScreenState();
 }
 
-class _CategoriesScreenState extends State<CategoriesScreen> {
+class CategoriesScreenState extends State<CategoriesScreen> {
   late List<Category> categories;
   late List<Subscription> subscriptions;
 

@@ -6,10 +6,10 @@ class UncategorizedSubscriptionsSheet extends StatelessWidget {
   final Function(Subscription) onAddToCategory;
 
   const UncategorizedSubscriptionsSheet({
-    Key? key,
+    super.key,
     required this.subscriptions,
     required this.onAddToCategory,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

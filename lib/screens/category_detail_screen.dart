@@ -13,16 +13,16 @@ class CategoryDetailScreen extends StatefulWidget {
   final int categoryIndex;
 
   const CategoryDetailScreen({
-    Key? key,
+    super.key,
     required this.category,
     required this.categoryIndex,
-  }) : super(key: key);
+  });
 
   @override
-  _CategoryDetailScreenState createState() => _CategoryDetailScreenState();
+  CategoryDetailScreenState createState() => CategoryDetailScreenState();
 }
 
-class _CategoryDetailScreenState extends State<CategoryDetailScreen>
+class CategoryDetailScreenState extends State<CategoryDetailScreen>
     with TickerProviderStateMixin {
   late List<Subscription> _categorySubscriptions;
   late AnimationController _animationController;
@@ -145,7 +145,7 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen>
   Widget _buildDismissBackground() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.red.withOpacity(0.2),
+        color: Colors.red.withValues(),
         borderRadius: BorderRadius.circular(12),
       ),
     );

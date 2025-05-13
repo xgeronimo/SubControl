@@ -7,12 +7,12 @@ class CategoryInfoCard extends StatelessWidget {
   final double yearlyTotal;
 
   const CategoryInfoCard({
-    Key? key,
+    super.key,
     required this.categoryName,
     required this.subscriptionsCount,
     required this.monthlyTotal,
     required this.yearlyTotal,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +27,7 @@ class CategoryInfoCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.blue.withOpacity(0.3),
+            color: Colors.blue.withValues(),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -70,7 +70,7 @@ class CategoryInfoCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
+        color: Colors.white.withValues(),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(

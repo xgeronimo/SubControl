@@ -1,4 +1,3 @@
-import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
 import '../models/subscription_model.dart';
 import '../models/category_model.dart';

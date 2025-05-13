@@ -9,14 +9,13 @@ import 'package:uuid/uuid.dart';
 class AddSubscriptionScreen extends StatefulWidget {
   final String? preselectedCategory;
 
-  const AddSubscriptionScreen({Key? key, this.preselectedCategory})
-      : super(key: key);
+  const AddSubscriptionScreen({super.key, this.preselectedCategory});
 
   @override
-  _AddSubscriptionScreenState createState() => _AddSubscriptionScreenState();
+  AddSubscriptionScreenState createState() => AddSubscriptionScreenState();
 }
 
-class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
+class AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _priceController = TextEditingController();
@@ -194,10 +193,10 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
   Widget _buildSaveButton() {
     return ElevatedButton(
         onPressed: _addSubscription,
-        child: const Text('Сохранить подписку'),
         style: ElevatedButton.styleFrom(
           minimumSize: const Size(double.infinity, 50),
-        ));
+        ),
+        child: const Text('Сохранить подписку'));
   }
 
   void _addSubscription() async {

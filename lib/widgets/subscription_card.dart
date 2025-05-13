@@ -7,6 +7,7 @@ class SubscriptionCard extends StatelessWidget {
   final VoidCallback onTap;
 
   const SubscriptionCard({
+    super.key,
     required this.subscription,
     required this.onTap,
   });

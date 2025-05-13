@@ -99,7 +99,6 @@ class NotificationService {
           presentSound: true,
         ),
       ),
-      androidAllowWhileIdle: true,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
     );

@@ -7,10 +7,10 @@ class StatsScreen extends StatelessWidget {
   final double totalMonthly;
 
   const StatsScreen({
-    Key? key,
+    super.key,
     required this.subscriptions,
     required this.totalMonthly,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -106,8 +106,9 @@ class StatsScreen extends StatelessWidget {
       final price = sub.price.toDouble();
       return sum + (sub.paymentPeriod == 'Год' ? price / 12 : price);
     });
-    if (uncategorizedTotal > 0)
+    if (uncategorizedTotal > 0) {
       categoryStats['Без категории'] = uncategorizedTotal;
+    }
 
     if (categoryStats.isEmpty) {
       return const Center(child: Text('Нет данных по категориям'));
