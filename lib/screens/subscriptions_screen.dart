@@ -37,6 +37,27 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
     });
   }
 
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.list_alt, size: 64, color: Colors.grey[300]),
+          const SizedBox(height: 16),
+          const Text(
+            'Нет созданных подписок',
+            style: TextStyle(fontSize: 18, color: Colors.grey),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Нажмите + чтобы создать новую',
+            style: TextStyle(color: Colors.grey[400]),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showStatistics(BuildContext context) {
     final allSubscriptions = HiveService.getSubscriptions();
     final totalMonthly = allSubscriptions.fold<double>(0, (sum, sub) {
@@ -96,19 +117,21 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
                     const EdgeInsetsDirectional.only(end: 0, bottom: 16),
               ),
             ),
-            SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (BuildContext context, int index) {
-                  final subscription = subscriptions[index];
-                  return SubscriptionCard(
-                    subscription: subscription,
-                    onTap: () =>
-                        _navigateToDetail(context, subscription, index),
-                  );
-                },
-                childCount: subscriptions.length,
-              ),
-            ),
+            subscriptions.isEmpty
+                ? SliverFillRemaining(child: _buildEmptyState())
+                : SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (BuildContext context, int index) {
+                        final subscription = subscriptions[index];
+                        return SubscriptionCard(
+                          subscription: subscription,
+                          onTap: () =>
+                              _navigateToDetail(context, subscription, index),
+                        );
+                      },
+                      childCount: subscriptions.length,
+                    ),
+                  ),
           ],
         ),
       ),
